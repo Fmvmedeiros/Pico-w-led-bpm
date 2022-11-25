@@ -6,7 +6,7 @@ import time
 from picozero import Pot, LED
 from time import sleep
 
-
+bpm = 0
 ap = network.WLAN(network.AP_IF)
 ap.config(essid="pico_wearables", password='inovlabs')
 ap.active(True)
@@ -14,7 +14,7 @@ ap.active(True)
 PowerLED = machine.Pin('LED', machine.Pin.OUT)
 PowerLED.on()
 
-led = LED(0) # pin onde está ligado o LED
+led = LED(0) # Pin onde está ligado o led.
 led.on
 
 def get_file(file_name):
@@ -34,15 +34,13 @@ print('Listening on', addr)
 while True:
     try:
         cl, addr = s.accept()
-
         r = str(cl.recv(1024))
         request = r # Copia os dados recebidos no socket.
-      
+            
         valor = 8 # Valor inicial
         BuscaValor = request.find("quantity") # Encontra a localização da primeira ocorrência da palavra "quantity"
         if BuscaValor > 0:
             BuscaValor = request[BuscaValor + 9 : BuscaValor + 12] # 
-#            print("BuscaValor:", BuscaValor)
             valor = int(BuscaValor)
             
             bpm = valor
@@ -50,12 +48,12 @@ while True:
             print("beat = ", beat)    
             brighter_time = beat / 2 # Spend half a beat getting brighter
             dimmer_time = beat / 2 # Spend half a beat getting dimmer
+            PowerLED.off() # Desliga o led do power
             led.pulse(brighter_time, dimmer_time, wait=False) # Pulsa o led
        
         print("valor:", valor)
         
 
-#        print(r)
         stateis = str(bpm) + " BPM"
         response = get_file("index.html") % stateis
         
@@ -65,5 +63,3 @@ while True:
         
     except OSError as e:
         cl.close()
-#        print('Connection closed')
-#        PowerLED.off()
